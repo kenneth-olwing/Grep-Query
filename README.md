@@ -25,8 +25,15 @@ The branching structure is intended to follow the version structure closely. The
 Once the tagging has been made, a new branch will be cut away, named after the major branch, e.g. '**1.xxx**'. The 'xxx' again stands for a number, now in the minor series such that only minor releases in the '1' major series may be done here, e.g. '1.002', '1.004' etc. Also '000' developer releases may be done here, tagged for example '1.001_000', which will result in a '**1.001_xxx**' branch, where further developer releases are tagged until finished. A developer release branch is not required, commits may happen directly on '1.xxx' until complete.
 
 When a sub branch is completed it will be merged back to it's parent, e.g. the '1.001_xxx' branch is eventually deemed ready, and is thus merged back to '1.xxx' for eventual release as '1.002'. The same holds true for '1.xxx' that it will eventually be merged back to 'x'.
-## Active versions and branches
-TBD
+## Releases
+  * **v1.000** on 2016-08-04
+## Active branches
+  * **master**  
+    For maintenance of this document only.
+  * **x**  
+    For work aimed at v2.000
+  * **1.xxx**  
+    For work aimed at v1.002 (not yet created)
 
 ##### LICENSE AND COPYRIGHT
 
