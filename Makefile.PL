@@ -19,7 +19,7 @@ WriteMakefile(
 		{
 			'ExtUtils::MakeMaker' => '7.12', 
 		},
-    TEST_REQUIRES =>
+	TEST_REQUIRES =>
 		{
 			'Test::More' => 0, # initial dev used: 1.001003
 			'Test::Differences' => 0, # initial dev used: 0.62 
@@ -29,7 +29,23 @@ WriteMakefile(
 		{
 			'Parse::RecDescent'	=> 0, # initial dev used: 1.967013
 			'IO::Scalar' => 0, # initial dev used: 2.111
-	    },
+		},
+	META_MERGE =>
+		{
+			'meta-spec' =>
+				{
+					version => 2,
+				},
+			resources =>
+				{
+					repository =>
+						{
+							type => 'git',
+							url => 'https://github.com/kenneth-olwing/Grep-Query.git',
+							web => 'https://github.com/kenneth-olwing/Grep-Query'
+						}
+				}
+		},
 	dist  =>
 		{
 			$^O eq 'MSWin32' ? (TARFLAGS => '--mode=755 -cvf') : (),
