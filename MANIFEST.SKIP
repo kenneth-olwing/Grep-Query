@@ -1,0 +1,9 @@
+\.git(ignore|/)
+\.includepath
+\.project
+\.settings/
+HACK/
+MANIFEST\.SKIP
+Grep-Query-\d+\.\d\d\d\.tar\.gz
+Grep-Query-\d+\.\d\d\d/
+\.ignore/
