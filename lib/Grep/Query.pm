@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -113,7 +113,7 @@ sub __qgrep
 	#
 	# for this, we must have a fieldaccessor 
 	#
-	my $repackagedHash = 0;
+	my $lonehash = 0;
 	if (scalar(@$list) == 1 && ref($list->[0]) eq 'HASH')
 	{
 		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
@@ -123,7 +123,7 @@ sub __qgrep
 			push(@eachList, \@kv);
 		}
 		$list = \@eachList;
-		$repackagedHash = 1;
+		$lonehash = 1;
 	} 
 	
 	# the list we were given needs to be made into a hash with unique keys so we
@@ -148,7 +148,7 @@ sub __qgrep
 	# fix up an array with the matches 
 	#	
 	my @matched;
-	if ($repackagedHash)
+	if ($lonehash)
 	{
 		# we started with a hash, so that is what should be returned
 		#
@@ -180,7 +180,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.001
+Version 1.002
 
 =head1 SYNOPSIS
 
@@ -226,6 +226,21 @@ Version 1.001
   #
   # @result contains a list of person objects that has a name starting with 'A' and an age greater than or equal to 42
   
+  # If what you have is a single hash (rather than a list of them) and you wish to query it and pick out key/values
+  # that matches, the query is special cased for passing just a single hash.
+  # A field accessor is necessary, and it will receive individual key/value pairs as small lists.
+  # 
+  # Assume a %videos hash, keyed by video name, and value is another hash with at least the key 'length' holding the video
+  # length in seconds...:
+  #
+  my $fieldAccessor = Grep::Query::FieldAccessor->new();
+  $fieldAccessor->add('key', sub { $_[0]->[0] });
+  $fieldAccessor->add('length', sub { $_[0]->[1]->{length} });
+  my $videoQuery = Grep::Query->new('key.REGEXP(^Alias) AND length.gt(2500)');
+  @result = $videoQuery->qgrep($fieldAccessor, \%videos);
+  #
+  # $result[0] contains a hash ref with all videos with name starting with 'Alias' and at least 2500 seconds long
+    
 =head1 BACKGROUND
 
 Why use this module when you could easily write a grep BLOCK or plain regexp
@@ -314,9 +329,10 @@ complex enough.
 
 =head1 DESCRIPTION
 
-The visible API is made to be simple/compact - the single method/function
+The visible API is made to be simple but also compact - the single method/function
 C<qgrep>, actually. For the slightly more complex scenarios a helper class is
-required, but again, a very simple one.
+required, but generally a very simple one giving high flexibility in how to structure
+the query itself regardless of how the list itself is laid out.
 
 It has a behavior similar to C<grep> - give it a list and get back a list (or
 in scalar context, the number of matches). The main difference is that the
@@ -334,14 +350,19 @@ This is a two-edged sword - I hope this will not be confusing.
 
 A query effectively have two slightly different "modes", depending on if the
 query is aimed at a list of ordinary scalars or if the list consists of objects
-(or plain hashes, which is regarded as a special case of objects). 
+(or plain hashes, which is regarded as a special case of objects). There is
+also a special case when you pass only a single hash ref - it can be treated
+as a list, and a new hash ref with matching key/value pairs passed back. 
 
 =over
 
 =item Scalars
 
 In the first case, the query doesn't use "field" names - it is implicit that
-the comparison should be made directly on scalars in the list. 
+the comparison should be made directly on scalars in the list.
+
+Note that is possible to use field names if desired - just make the accessors
+so that it properly extracts parts of each scalar.
 
 =item Hashes/Objects
 
@@ -358,13 +379,17 @@ necessary field accessor if one is not passed in.
 It's important to note that either the query uses field names everywhere, or
 not at all. Mixing comparisons with field names and others without is illegal.
 
+For hashes/objects it's necessary to use field names - otherwise you will match
+against scalar representations of hashref values for example, e.g. 'HASH(0x12345678)'.
+Hardly useful.
+
 =head3 SYNTAX
 
 The query language syntax is fairly straightforward and can be divided in two main
 parts: the logical connectors and the comparison atoms.
 
-In the tables below, note that case is irrelevant, i.e. AND == and == And and
-so on.
+In the tables below, note that case is irrelevant, i.e. 'AND' is equal to 'and' which is
+equal to 'And' and so on.
 
 =over
 
@@ -508,7 +533,8 @@ The given C<$query> string will be parsed on the fly and executed against the
 data, using the C<$fieldAccessor> object to get values from C<@data> objects.
 
 Note: In a certain case, the C<$fieldAccessor> argument can be passed as
-C<undef> and it will be auto-generated. See below for details. 
+C<undef> and it will be auto-generated. See below for details.
+ 
 
 =item * OO, no fields: $obj->qgrep( @data )
 
@@ -523,6 +549,12 @@ objects.
 
 Note: In a certain case, the C<$fieldAccessor> argument can be passed as
 C<undef> and it will be auto-generated. See below for details. 
+
+=item * Passing a single hashref: qgrep($fieldAccessor, \%hash)
+
+In this case, the field accessor methods will be called with two-item
+arrayrefs, e.g. the key is in the first (0) slot, and the value is in the
+second (1) slot.
 
 =back
 

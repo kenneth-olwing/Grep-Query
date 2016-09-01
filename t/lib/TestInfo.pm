@@ -231,10 +231,16 @@ my $data =
 			{
 				# FIXUP
 			},
+			
+		lonehash =>
+			{
+				# FIXUP
+			},
 	};
 
 $data->{objects}->{$_} = TestObject->new($_, $data->{records}->{$_}) foreach (keys(%{$data->{records}}));
-	
+$data->{lonehash} = { lonehash => $data->{records} };
+
 my $tests =
 	{
 		numbers =>
@@ -558,27 +564,27 @@ QRY
 				},
 				{
 					q => 'name.REGEXP/(?i)a/',
-					e => [ split('', 'adfghijlmopqrsuvwxy') ],
+					e => [ qw(a d f g h i j l m o p q r s u v w x y) ],
 				},
 				{
 					q => 'name.REGEXP/(?i)a/ AND siblings.>(1)',
-					e => [ split('', 'afgjmopqsuvwx') ],
+					e => [ qw(a f g j m o p q s u v w x) ],
 				},
 				{
 					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960)',
-					e => [ split('', 'afgmpqsw') ],
+					e => [ qw(a f g m p q s w) ],
 				},
 				{
 					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M)',
-					e => [ split('', 'fmw') ],
+					e => [ qw(f m w) ],
 				},
 				{
 					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M) AND city.REGEXP(z)',
-					e => [ split('', 'fm') ],
+					e => [ qw(f m) ],
 				},
 				{
 					q => 'NOT name.REGEXP/(?i)a/ AND sex.REGEXP(M) OR city.REGEXP(z)',
-					e => [ split('', 'cefkmnz') ],
+					e => [ qw(c e f k m n z) ],
 				},
 				{
 					q => <<'QRY',
@@ -602,19 +608,76 @@ QRY
 							)
 						)
 QRY
-					e => [ split('', 'afmps') ],
+					e => [ qw(a f m p s) ],
 				},
 				{
 					q => 'age.==(53)',
-					e => [ split('', 'k') ],
+					e => [ qw(k) ],
 				},
 				{
 					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND age.>(30) AND city.REGEXP(l)',
-					e => [ split('', 'aps') ],
+					e => [ qw(a p s) ],
 				},
 				{
 					q => 'age.>=(30) AND age.<=(60)',
-					e => [ split('', 'chjklnqsv') ],
+					e => [ qw(c h j k l n q s v) ],
+				},
+			],
+			
+		lonehash =>
+			[
+				{
+					q => 'key.REGEXP(.*)',
+					e => undef,		# FIXUP
+				},
+				{
+					q => 'key.REGEXP([dkob])',
+					e => [ qw(b d k o) ],
+				},
+
+				{
+					q => 'name.REGEXP/(?i)a/',
+					e => [ qw(a d f g h i j l m o p q r s u v w x y) ],
+				},
+				{
+					q => 'name.REGEXP/(?i)a/ AND siblings.>(1)',
+					e => [ qw(a f g j m o p q s u v w x) ],
+				},
+				{
+					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960)',
+					e => [ qw(a f g m p q s w) ],
+				},
+				{
+					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M)',
+					e => [ qw(f m w) ],
+				},
+				{
+					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M) AND city.REGEXP(z)',
+					e => [ qw(f m) ],
+				},
+				{
+					q => <<'QRY',
+						name.REGEXP/(?i)a/
+							AND
+						siblings.>(1)
+							AND
+						byear.<(1960)
+							AND
+						(
+							(
+								sex.REGEXP(M)
+									AND
+								city.REGEXP(z)
+							)
+								OR
+							(
+								sex.REGEXP(F)
+									AND
+								city.REGEXP(l)
+							)
+						)
+QRY
+					e => [ qw(a f m p s) ],
 				},
 			]
 	};
@@ -626,6 +689,10 @@ $tests->{records}->[0]->{e} = \@recordValues;
 my @objectValues;
 push(@objectValues, $data->{objects}->{$_}) foreach (sort(keys(%{$data->{objects}})));
 $tests->{objects}->[0]->{e} = [ map { $_->get_id() } @objectValues ];
+
+my @lonehashValues;
+push(@lonehashValues, $_) foreach (sort(keys(%{$data->{lonehash}->{lonehash}})));
+$tests->{lonehash}->[0]->{e} = \@lonehashValues;
 
 my $fieldAccessors =
 	{
@@ -658,6 +725,21 @@ my $fieldAccessors =
 						}
 					),
 			],	
+
+		lonehash =>
+			[
+				Grep::Query::FieldAccessor->new
+					(
+						{
+							key => sub { $_[0]->[0] },
+							name => sub { $_[0]->[1]->{name} },
+							byear => sub { $_[0]->[1]->{byear} },
+							siblings => sub { $_[0]->[1]->{siblings} },
+							city => sub { $_[0]->[1]->{city} },
+							sex => sub { $_[0]->[1]->{sex} },
+						}
+					),
+			],	
 	};
 	
 my $recordFieldAccessor = Grep::Query::FieldAccessor->new();
@@ -680,8 +762,9 @@ my $matchAdjustors =
 	{
 		records => sub { $_[0] },
 		objects => sub { [ map { $_->get_id() } @{$_[0]} ] },
+		lonehash => sub { [ sort(keys(%{$_[0]->[0]})) ] },
 	};
-	
+
 sub getData
 {
 	return $data->{$_[0]};
