@@ -105,6 +105,27 @@ sub __qgrep
 		croak("no fields used in query, yet the first argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
 	}
 
+	my $list = \@_;
+	
+	# a special case:
+	# if there is only one argument AND it is a hash ref, we can let loose a query on it
+	# assuming we restructure the incoming data as a list of individual key/value pairs
+	#
+	# for this, we must have a fieldaccessor 
+	#
+	my $repackagedHash = 0;
+	if (scalar(@$list) == 1 && ref($list->[0]) eq 'HASH')
+	{
+		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
+		my @eachList;
+		while (my @kv = each %{$list->[0]})
+		{
+			push(@eachList, \@kv);
+		}
+		$list = \@eachList;
+		$repackagedHash = 1;
+	} 
+	
 	# the list we were given needs to be made into a hash with unique keys so we
 	# identify 'rows' while evaluating the query
 	# 
@@ -114,7 +135,7 @@ sub __qgrep
 	# keys are simply a number, and values are refs to the individual scalars/objects to avoid copying them
 	#
 	my $id = 0;
-	my %data = map { $id++ => \$_ } @_;
+	my %data = map { $id++ => \$_ } @$list;
 	
 	# kick off the query 
 	#
@@ -124,15 +145,29 @@ sub __qgrep
 	#	
 	return scalar(keys(%data)) unless wantarray();
 
-	# fix up an array with the matches; keep the (relative) order they we're given to us
+	# fix up an array with the matches 
 	#	
 	my @matched;
-	foreach my $k (sort { $a <=> $b } (keys(%data)))
+	if ($repackagedHash)
 	{
-		push(@matched, ${$data{$k}});
-	} 
-	
-	# now return the full list
+		# we started with a hash, so that is what should be returned
+		#
+		my %h;
+		$h{${$data{$_}}->[0]} = ${$data{$_}}->[1] foreach (keys(%data));
+		push(@matched, \%h);
+	}
+	else
+	{
+		# keep the (relative) order they we're given to us by sorting on the artificial
+		# key index we gave them
+		#
+		foreach my $k (sort { $a <=> $b } (keys(%data)))
+		{
+			push(@matched, ${$data{$k}});
+		} 
+	}
+		
+	# now return the result list
 	#
 	return @matched;
 }
@@ -196,7 +231,7 @@ Version 1.001
 Why use this module when you could easily write a grep BLOCK or plain regexp
 EXPR to select things in a list using whatever criteria you desired?
 
-=head4 My original use-case was this: 
+=head2 The original use-case was this: 
 
 Given a number of commandline tools I provide to users in my workplace, quite
 frequently I wanted the user to be able to express, with some flag(s), a
@@ -209,11 +244,13 @@ Example: the user gives the command:
 
   SomeCommand /some/path
 
-The 'SomeCommand' will scan the given path and for all files it finds it will
+The 'SomeCommand' may, for example, scan the given path and for all files it finds it will
 do something useful. So, I also wanted to provide flags for the command such
-that they can say:
+that they can say...
 
   SomeCommand -exclude 'some_regexp' /some/path
+
+...in order to filter the list of files that should be worked on.
 
 Obviously not a problem, and I also provided the reverse if that was more
 convenient:
@@ -232,8 +269,8 @@ think you get the idea.
 What I found however is that it becomes hard to string together regexps to find
 the exact subset you want when the rules are a bit more complex. In fact, while
 regexps are powerful, they're not that suited to easily mix multiple of them
-(and some expressions are basically impossible), especially when you try to
-provide a commandline interface to them...
+(and some expressions are basically impossible, e.g. 'I want this but not this'),
+especially when you try to provide a commandline interface to them...
 
 Thus, instead I'd wanted to provide a more capable way for a user to give a
 more complex query, i.e. where it'd be possible to use AND/OR/NOT as well as
@@ -265,7 +302,7 @@ numerical comparisons rather than just regular expressions.
 
 Hence, this module to encapsulate the mechanism.
 
-=head4 Is it for you?
+=head3 Is it for you?
 
 It may be comparatively slow and very memory-intensive depending on the
 complexity of the query and the size of the original data set.
