@@ -1,5 +1,8 @@
 Revision history for Grep-Query
 
+1.002	20160901
+		Added the ability to pass a single hash ref as something to query
+
 1.001	20160804
 		Minor cleanups in some markdown.
 		Change Makefile to be nicer to installations with a not-so-uptodate
