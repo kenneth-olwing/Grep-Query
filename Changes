@@ -1,5 +1,10 @@
 Revision history for Grep-Query
 
+1.003	20170102
+		Minor test fix to handle the amazingly stupid test using the *actual*
+		year to	calculate the age against the fixed test data and coming up
+		with a fixed value...New Year's rolling in caused failures of course.  
+
 1.002	20160901
 		Added the ability to pass a single hash ref as something to query
 
