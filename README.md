@@ -22,6 +22,7 @@ When a sub branch is completed it will be merged back to it's parent, e.g. the '
   * **v1.001** on 2016-08-04
   * **v1.002** on 2016-09-01
   * **v1.003** on 2017-01-02
+  * **v1.004** on 2017-01-11
 
 ### Active branches
   * **master**  
@@ -29,7 +30,7 @@ When a sub branch is completed it will be merged back to it's parent, e.g. the '
   * **x**  
     For work aimed at v2.000
   * **1.xxx**  
-    For work aimed at v1.004
+    For work aimed at v1.005
 
 #### LICENSE AND COPYRIGHT
 
