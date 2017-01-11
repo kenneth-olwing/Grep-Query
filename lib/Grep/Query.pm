@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -58,6 +58,13 @@ sub qgrep
 			:	__PACKAGE__->new($arg);
 			
 	return $obj->__qgrep(@_);
+}
+
+sub getQuery
+{
+	my $self = shift;
+	
+	return $self->{_query};
 }
 
 # don't call this directly, use the above
@@ -180,7 +187,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.003
+Version 1.004
 
 =head1 SYNOPSIS
 
@@ -504,6 +511,10 @@ Croaks if a problem is discovered.
   # create a G::Q object
   #
   my $gq = Grep::Query->new('==(42) OR >(100)');
+
+=head2 getQuery()
+
+Returns the original query text.
 
 =head2 qgrep
 

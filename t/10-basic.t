@@ -4,11 +4,13 @@ use warnings;
 use Grep::Query qw(qgrep);
 use Grep::Query::FieldAccessor;
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 is(scalar(qgrep('REGEXP(.*)')), 0, "query empty plain set (non-OO)");
 
-my $gq1 = Grep::Query->new('REGEXP(.*)');
+my $q1 = 'REGEXP(.*)';
+my $gq1 = Grep::Query->new($q1);
+is($gq1->getQuery(), $q1, 'verify query text');
 is(scalar($gq1->qgrep()), 0, "query empty plain set");
 
 my $gq2 = Grep::Query->new('field1.REGEXP(.*)');
