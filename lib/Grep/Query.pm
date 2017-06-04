@@ -450,6 +450,10 @@ The I<operator>s are:
 
 =over
 
+=item * B<TRUE> or B<FALSE>
+
+These operators always evaluate to true and false respectively.
+
 =item * B<REGEXP> or B<=~>
 
 This operator expects to use the I<value> as a regular expression for use in

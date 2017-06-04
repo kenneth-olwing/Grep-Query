@@ -4,7 +4,12 @@ use warnings;
 use Grep::Query qw(qgrep);
 use Grep::Query::FieldAccessor;
 
-use Test::More tests => 9;
+use Test::More tests => 13;
+
+is(scalar(qgrep('true')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('TRUE')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('false')), 0, "query empty plain set (non-OO)");
+is(scalar(qgrep('FALSE')), 0, "query empty plain set (non-OO)");
 
 is(scalar(qgrep('REGEXP(.*)')), 0, "query empty plain set (non-OO)");
 

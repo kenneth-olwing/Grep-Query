@@ -246,6 +246,16 @@ my $tests =
 		numbers =>
 			[
 				{
+					q => 'true',
+					e => $data->{numbers},
+					dbq => q/always true/,
+				}, 
+				{
+					q => 'false',
+					e => [ ],
+					dbq => q/always false/,
+				}, 
+				{
 					q => '>(-6)',
 					e => $data->{numbers},
 					dbq => q/number > -6/,
@@ -279,6 +289,14 @@ my $tests =
 			
 		strings =>
 			[
+				{
+					q => 'TRUE',
+					e => $data->{strings},
+				}, 
+				{
+					q => 'FALSE',
+					e => [ ],
+				}, 
 				{
 					q => 'NE(*%&)',
 					e => $data->{strings},
@@ -503,6 +521,16 @@ my $tests =
 					q => 'name.REGEXP(.*)',
 					e => undef,		# FIXUP
 					dbq => q/name REGEXP '.*'/,
+				},
+				{
+					q => 'name.true',
+					e => [ map { $data->{records}->{$_} } ('a' .. 'z') ],
+					dbq => q/always true/,
+				},
+				{
+					q => 'name.FALSE',
+					e => [ ],
+					dbq => q/always false/,
 				},
 				{
 					q => 'name.REGEXP/(?i)a/',
