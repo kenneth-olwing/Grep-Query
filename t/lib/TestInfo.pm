@@ -248,12 +248,10 @@ my $tests =
 				{
 					q => 'true',
 					e => $data->{numbers},
-					dbq => q/always true/,
 				}, 
 				{
 					q => 'false',
 					e => [ ],
-					dbq => q/always false/,
 				}, 
 				{
 					q => '>(-6)',
@@ -525,12 +523,10 @@ my $tests =
 				{
 					q => 'name.true',
 					e => [ map { $data->{records}->{$_} } ('a' .. 'z') ],
-					dbq => q/always true/,
 				},
 				{
 					q => 'name.FALSE',
 					e => [ ],
-					dbq => q/always false/,
 				},
 				{
 					q => 'name.REGEXP/(?i)a/',
@@ -614,7 +610,6 @@ QRY
 						)
 QRY
 					e => [ map { $data->{records}->{$_} } split('', 'afmps') ],
-					dbq => q/name REGEXP '(?i)a' AND siblings > 1 AND byear < 1960 AND ( ( sex REGEXP 'M' AND city REGEXP 'z' ) OR ( sex REGEXP 'F' AND city REGEXP 'l' ) )/,
 				},
 			],
 		
