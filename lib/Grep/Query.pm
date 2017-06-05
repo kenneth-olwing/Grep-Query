@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -187,7 +187,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.004
+Version 1.005
 
 =head1 SYNOPSIS
 
@@ -399,6 +399,10 @@ In the tables below, note that case is irrelevant, i.e. 'AND' is equal to 'and' 
 equal to 'And' and so on.
 
 =over
+
+=item Comments
+
+Comments can be used in the query using the begin/end style like '/* some comment */'.
 
 =item Logical connectors
 

@@ -23,6 +23,7 @@ sub parsequery
 	{
 		local $/ = undef;
 		my $grammar = <DATA>;
+		local $Parse::RecDescent::skip = qr#(?ms:\s+|/\*.*?\*/)*#;
 		$PARSER = Parse::RecDescent->new($grammar);
 		die("Failed to parse query grammar") unless defined($PARSER);
 	}

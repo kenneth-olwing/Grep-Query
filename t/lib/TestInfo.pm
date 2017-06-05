@@ -582,6 +582,40 @@ QRY
 					e => [ map { $data->{records}->{$_} } split('', 'afmps') ],
 					dbq => q/name REGEXP '(?i)a' AND siblings > 1 AND byear < 1960 AND ( ( sex REGEXP 'M' AND city REGEXP 'z' ) OR ( sex REGEXP 'F' AND city REGEXP 'l' ) )/,
 				},
+				{
+					q => <<'QRY',
+						/* lots of comments */
+						
+						/* first check that the name contains an 'a' or 'A' 
+						name.REGEXP/(?i)a/
+							AND
+						/* and then:
+						     check that siblings are > 1
+						*/
+						siblings.>(1)
+							AND
+						/*
+							and, that birth year is less than 1960 */
+						byear.<(1960)
+							AND
+						(
+							/* while also determining things about sex/city */
+							(
+								sex.REGEXP(M)
+									AND
+								city.REGEXP(z)
+							)
+								OR /**/
+							(
+								sex.REGEXP(F)
+									AND
+								city.REGEXP(l)
+							)
+						)
+QRY
+					e => [ map { $data->{records}->{$_} } split('', 'afmps') ],
+					dbq => q/name REGEXP '(?i)a' AND siblings > 1 AND byear < 1960 AND ( ( sex REGEXP 'M' AND city REGEXP 'z' ) OR ( sex REGEXP 'F' AND city REGEXP 'l' ) )/,
+				},
 			],
 		
 		objects =>
