@@ -16,8 +16,8 @@ chdir($toplevel) or die("Failed to chdir to $toplevel: $!\n");
 
 my %files = 
 	(
-		'README.md' => 1,
-		'lib/Grep/Query.pm' => 8,
+		'README.md' => [1],
+		'lib/Grep/Query.pm' => [8, 190],
 	);
 
 foreach my $fn (keys(%files))
@@ -60,14 +60,16 @@ my $nextTag = "v$nextVersion";
 
 foreach my $fn (keys(%files))
 {
-	my $line = $files{$fn};
+	my $lines = $files{$fn};
 	$fn = "$toplevel/$fn";
-	
-	my $idx = $line - 1;
-	my @contents = readAll($fn);
-	die("The file '$fn' does not have the current version '$currentVersion' in line $line\n") unless $contents[$idx] =~ /$currentVersionRE/;
-	$contents[$idx] =~ s/$currentVersionRE/$nextVersion/;
-	writeAll($fn, @contents);
+	foreach my $line (@$lines)
+	{
+		my $idx = $line - 1;
+		my @contents = readAll($fn);
+		die("The file '$fn' does not have the current version '$currentVersion' in line $line\n") unless $contents[$idx] =~ /$currentVersionRE/;
+		$contents[$idx] =~ s/$currentVersionRE/$nextVersion/;
+		writeAll($fn, @contents);
+	}
 }
 
 my @mk = qx(perl Makefile.PL 2>&1);
