@@ -1,5 +1,9 @@
 Revision history for Grep-Query
 
+1.007	2017-08-09
+
+	No G::Q changes, just fixing version number(s) in files
+
 1.006	2017-07-03
 
 	Only use op if left side (from users list) is defined
