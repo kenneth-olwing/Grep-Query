@@ -187,7 +187,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.005
+Version 1.006
 
 =head1 SYNOPSIS
 
