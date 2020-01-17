@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 our @CARP_NOT = qw(Regexp::Query);
 
-## CTOR
+## CTOR(s)
 ##
 sub new
 {
@@ -26,6 +26,22 @@ sub new
 	
 	return $self;
 }
+
+sub newDefault
+{
+	my $class = shift;
+	my $fields = shift;
+
+	my $self = $class->new();
+	foreach my $field (@_)
+	{
+		$self->add($field, sub { $self->__fetchvalue($field, $_[0]) } );
+	}
+	
+	return $self;
+}
+
+## MEMBER(S)
 
 sub add
 {
@@ -58,6 +74,17 @@ sub assertField
 	croak("invalid field name '$field'") unless $accessor;
 	
 	return $accessor;
+}
+
+## PRIVATE
+
+sub __fetchvalue
+{
+	my $self = shift;
+	my $field = shift;
+	my $obj = shift;
+	
+	return $obj->{$field};
 }
 
 1;

@@ -98,11 +98,7 @@ sub __qgrep
 			# for laziness, the caller passed undef and so we can assume the objects to be queried
 			# are in fact plain hashes so we manufacture a field accessor for that
 			#
-			$fieldAccessor = Grep::Query::FieldAccessor->new();
-			foreach my $field (@{$self->{_fieldrefs}})
-			{
-				$fieldAccessor->add($field, sub { $_[0]->{$field} } );
-			}
+			$fieldAccessor = Grep::Query::FieldAccessor->newDefault(@{$self->{_fieldrefs}});
 		}
 	}
 	else
