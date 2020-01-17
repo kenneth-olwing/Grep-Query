@@ -6,6 +6,7 @@ META.*
 MYMETA.*
 .build/
 _build/
+tmp/
 cover_db/
 blib/
 inc/
