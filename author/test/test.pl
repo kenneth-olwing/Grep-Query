@@ -6,6 +6,51 @@ use lib "$Bin/../../lib";
 use Data::Dump qw(pp);
 use Grep::Query qw(qgrep);
 
+use Digest::Adler32;
+
+my $digest = Digest::Adler32->new();
+
+print fingerprint($digest, undef)->hexdigest(), "\n";
+print fingerprint($digest, '')->hexdigest(), "\n";
+print fingerprint($digest, [])->hexdigest(), "\n";
+print fingerprint($digest, {})->hexdigest(), "\n";
+print fingerprint($digest, [0])->hexdigest(), "\n";
+print fingerprint($digest, [[]])->hexdigest(), "\n";
+print fingerprint($digest, {fee=>0, fie=>0, foo=>0})->hexdigest(), "\n";
+print fingerprint($digest, {foo=>0, fie=>0, fee=>0})->hexdigest(), "\n";
+
+sub fingerprint
+{
+	my $digest = shift;
+	my $obj = shift;
+
+	my $type = ref($obj);
+	$digest->add($type);
+	if ($type eq 'ARRAY')
+	{
+		fingerprint($digest, $_) foreach (@$obj);
+	}
+	elsif ($type eq 'HASH')
+	{
+		fingerprint($digest, $obj->{$_}) foreach (sort(keys(%$obj)));
+	}
+	else
+	{
+		$digest->add($digest->digest());
+	}
+	
+	return $digest;	
+}
+
+__END__
+print $digest->hexdigest(), "\n";
+$digest->reset();
+$digest->add($digest->hexdigest());
+print $digest->hexdigest(), "\n";
+
+
+
+__END__
 my @hl =
 (
 	{ fee => 1, fie => 2, foo => 3 },

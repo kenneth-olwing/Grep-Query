@@ -13,6 +13,7 @@ use Grep::Query::FieldAccessor;
 
 use Scalar::Util qw(blessed);
 use Carp;
+use Digest::MD5;
 
 # allow importing the qgrep function/method
 # to enable non-OO use
@@ -112,6 +113,21 @@ sub __qgrep
 	#
 	my @list = map { defined($_) ? $_ : () } @_;
 	
+	# nothing to see here
+	#
+	return(wantarray() ? () : 0) unless @list;
+	
+	# try to make sure all items in the list have the same structure...
+	#
+	if (@list > 1)
+	{
+		my $fp = __fingerprint(Digest::MD5->new(), $list[0])->hexdigest();
+		foreach my $entry (@list)
+		{
+			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
+		}
+	}
+	
 	# a special case:
 	# if there is only one argument AND it is a hash ref, we can let loose a query on it
 	# assuming we restructure the incoming data as a list of individual key/value pairs
@@ -175,6 +191,20 @@ sub __qgrep
 	# now return the result list
 	#
 	return @matched;
+}
+
+sub __fingerprint
+{
+	my $digest = shift;
+	my $obj = shift;
+
+	my $type = ref($obj);
+	$digest->add($type);
+	if 		($type eq 'ARRAY')	{ __fingerprint($digest, $_) foreach (@$obj) }
+	elsif 	($type eq 'HASH')	{ __fingerprint($digest, $obj->{$_}) foreach (sort(keys(%$obj))) }
+	else						{ $digest->add($digest->digest()) }
+	
+	return $digest;	
 }
 
 1;
