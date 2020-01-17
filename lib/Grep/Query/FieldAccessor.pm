@@ -34,7 +34,7 @@ sub newDefault
 	my $self = $class->new();
 	foreach my $field (@_)
 	{
-		$self->add($field, sub { $self->__fetchvalue($field, $_[0]) } );
+		$self->add($field, sub { $self->__fetchvalue($field, $_[0], split(/->/, $field)) } );
 	}
 	
 	return $self;
@@ -82,8 +82,35 @@ sub __fetchvalue
 	my $self = shift;
 	my $field = shift;
 	my $obj = shift;
+
+	# if there is no more in the navpath, we just return the obj
+	#
+	return $obj unless @_;
 	
-	return $obj->{$field};
+	# else, pick out the next piece of the navpath
+	#
+	my $point = shift(@_);
+	my ($arridx, $exptype);
+	
+	# do we have a hash key or an array index?
+	#
+	if ($point =~ /^\[(\d+)\]$/)
+	{
+		($arridx, $exptype) = ($1, 'ARRAY');
+	}
+	else
+	{
+		($arridx, $exptype) = (undef, 'HASH');
+	}
+	
+	# make sure the obj is of the expected type
+	#		
+	my $objtype = ref($obj);
+	croak("the field '$field' at point '$point' does not have the expected type: $exptype != $objtype") unless $exptype eq $objtype;
+	
+	# recurse by following the navpath
+	#
+	return $self->__fetchvalue($field, (defined($arridx) ? $obj->[$arridx] : $obj->{$point}), @_);
 }
 
 1;
@@ -133,6 +160,11 @@ Creates a new field accessor object.
 
 If the optional C<$hash> is provided, fields will be populated from it,
 otherwise the L</add> method must be used.
+
+=head2 newDefault( @fieldlist )
+
+Creates a new field accessor object with default accessors for all the fields
+in the given list. It will handle fields expressing navigation paths automatically.
 
 =head2 add( $fieldname, $sub )
 
