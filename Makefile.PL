@@ -66,7 +66,7 @@ WriteMakefile(
 		},
 	dist  =>
 		{
-			$IS_WIN32 ? (TARFLAGS => '--mode=755 -cvf') : (),
+			$IS_WIN32 ? (TARFLAGS => '-cvf') : (),
 			COMPRESS => 'gzip -9f',
 			SUFFIX => 'gz',
 			DIST_DEFAULT => 'test xtest tardist'
