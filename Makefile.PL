@@ -62,6 +62,7 @@ WriteMakefile(
 				: ( %$configure_requires, %$test_requires ),
 			'Parse::RecDescent'	=> 0, # initial dev used: 1.967013
 			'IO::Scalar' => 0, # initial dev used: 2.111
+			'Digest::MD5' => 0,
 		},
 	dist  =>
 		{
