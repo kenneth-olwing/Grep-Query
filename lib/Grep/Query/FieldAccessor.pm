@@ -110,7 +110,7 @@ sub __fetchvalue
 	
 	# recurse by following the navpath
 	#
-	return $self->__fetchvalue($field, ($arridx ? $obj->[$arridx] : $obj->{$point}), @_);
+	return $self->__fetchvalue($field, (defined($arridx) ? $obj->[$arridx] : $obj->{$point}), @_);
 }
 
 1;
@@ -160,6 +160,11 @@ Creates a new field accessor object.
 
 If the optional C<$hash> is provided, fields will be populated from it,
 otherwise the L</add> method must be used.
+
+=head2 newDefault( @fieldlist )
+
+Creates a new field accessor object with default accessors for all the fields
+in the given list. It will handle fields expressing navigation paths automatically.
 
 =head2 add( $fieldname, $sub )
 

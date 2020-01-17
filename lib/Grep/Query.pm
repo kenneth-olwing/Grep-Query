@@ -82,7 +82,7 @@ sub __qgrep
 	my $fieldAccessor;
 	if (@{$self->{_fieldrefs}})
 	{
-		# the query uses fields, so there must be field accessor first 
+		# the query uses fields, so there must be a field accessor first 
 		#
 		$fieldAccessor = shift(@_);
 		
@@ -377,7 +377,10 @@ to provide the query engine with the mapping between a field name and the data.
 
 A special case occurs when the list consists of hashes with keys being exactly
 the field names - if so, the query engine can transparently create the
-necessary field accessor if one is not passed in. 
+necessary field accessor if one is not passed in.
+
+The default field accessor also understands 'navigation paths', i.e. handling
+a deep structure with lists-in-lists/hashes etc. This will work to any depth.
 
 =back
 
@@ -582,7 +585,12 @@ names used in the query, the query engine can autogenerate a field accessor.
 
 This is only a convenience, a manually constructed field accessor will be used
 if given. To take advantage of the convenience, simply pass C<undef> as the
-C<$fieldAccessor> argument. 
+C<$fieldAccessor> argument.
+
+If you have a deep structure, you may use 'field' names connected by '->' linkages,
+where raw text are used as regular hash keys and array indexes are denoted using
+[<index>]. When the end of the navigation path has been reached the object at that
+location is returned.
 
 =head3 EXAMPLES
 
@@ -634,6 +642,18 @@ C<$fieldAccessor> argument.
   $matches = qgrep('fieldX.>(20) AND fieldY.>(40)', $fieldAccessor, @hashData);
   #
   # $matches again 2
+  
+  # a hash with depth
+  #
+  my @hashData = 
+  	(
+  		{ x => { fee => 1, fie => 2, foo => 3 }, y => [ 2, 4, 6 ]  },
+  		{ x => { fee => 10, fie => 20, foo => 30 }, y => [ 12, 14, 16 ]  },
+  		{ x => { fee => 100, fie => 200, foo => 300 }, y => [ 22, 24, 26 ]  },
+  	);
+  $matches = qgrep('x->fie.>(30) AND y->[2].>(20)', undef, @hashData);
+  #
+  # $matches is now 1 (matching last entry)
   
 =head1 AUTHOR
 
