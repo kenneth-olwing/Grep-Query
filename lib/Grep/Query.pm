@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -215,7 +215,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.008
+Version 1.009
 
 =head1 SYNOPSIS
 

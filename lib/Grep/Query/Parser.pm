@@ -3,7 +3,7 @@ package Grep::Query::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 $VERSION = eval $VERSION;
 
 use Carp;
