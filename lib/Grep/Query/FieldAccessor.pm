@@ -5,6 +5,9 @@ package Grep::Query::FieldAccessor;
 use strict;
 use warnings;
 
+our $VERSION = '1.008';
+$VERSION = eval $VERSION;
+
 use Carp;
 our @CARP_NOT = qw(Regexp::Query);
 
