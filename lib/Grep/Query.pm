@@ -90,7 +90,7 @@ sub __qgrep
 		{
 			# verify that the field accessor is of the right sort and has the known fields
 			#
-			croak("field names used in query; first argument must be a field accessor") unless ref($fieldAccessor) eq 'Grep::Query::FieldAccessor';
+			croak("field names used in query; the argument before the list must be a field accessor") unless ref($fieldAccessor) eq 'Grep::Query::FieldAccessor';
 			$fieldAccessor->assertField($_) foreach (@{$self->{_fieldrefs}});
 		}
 		else
@@ -105,10 +105,12 @@ sub __qgrep
 	{
 		# it's weird if a field accessor is present, but the query uses no fields - flag that mistake
 		#
-		croak("no fields used in query, yet the first argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
+		croak("no fields used in query, yet the first list argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
 	}
 
-	my $list = \@_;
+	# trim away undef values
+	#
+	my @list = map { defined($_) ? $_ : () } @_;
 	
 	# a special case:
 	# if there is only one argument AND it is a hash ref, we can let loose a query on it
@@ -117,15 +119,15 @@ sub __qgrep
 	# for this, we must have a fieldaccessor 
 	#
 	my $lonehash = 0;
-	if (scalar(@$list) == 1 && ref($list->[0]) eq 'HASH')
+	if (scalar(@list) == 1 && ref($list[0]) eq 'HASH')
 	{
 		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
 		my @eachList;
-		while (my @kv = each %{$list->[0]})
+		while (my @kv = each %{$list[0]})
 		{
 			push(@eachList, \@kv);
 		}
-		$list = \@eachList;
+		@list = @eachList;
 		$lonehash = 1;
 	} 
 	
@@ -138,7 +140,7 @@ sub __qgrep
 	# keys are simply a number, and values are refs to the individual scalars/objects to avoid copying them
 	#
 	my $id = 0;
-	my %data = map { $id++ => \$_ } @$list;
+	my %data = map { $id++ => \$_ } @list;
 	
 	# kick off the query 
 	#
