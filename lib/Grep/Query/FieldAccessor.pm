@@ -30,7 +30,6 @@ sub new
 sub newDefault
 {
 	my $class = shift;
-	my $fields = shift;
 
 	my $self = $class->new();
 	foreach my $field (@_)
