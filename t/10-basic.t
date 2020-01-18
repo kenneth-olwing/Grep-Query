@@ -9,12 +9,14 @@ push(@miscDelims, chr($_)) for (33..39, 42..59, 61, 63..90, 92, 94..122, 124, 12
 
 use Test::More;
 
-plan(tests => 22 + scalar(@miscDelims));
+plan(tests => 23 + scalar(@miscDelims));
 
 is(scalar(qgrep('true')), 0, "query empty plain set (non-OO)");
 is(scalar(qgrep('TRUE')), 0, "query empty plain set (non-OO)");
 is(scalar(qgrep('false')), 0, "query empty plain set (non-OO)");
 is(scalar(qgrep('FALSE')), 0, "query empty plain set (non-OO)");
+
+is(scalar(qgrep('defined', 1, undef, 2, undef)), 2, "query set with two defined values (non-OO)");
 
 is(scalar(qgrep('REGEXP(.*)')), 0, "query empty plain set (non-OO)");
 

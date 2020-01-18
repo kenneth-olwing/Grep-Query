@@ -78,12 +78,16 @@ sub __qgrep
 	
 	my $self = shift(@_);
 
+	# make a note of if any query value is a ref
+	#
+	my $refCount = scalar(grep { ref($_) } @_);
+	
 	# first check if the first argument is/should be a field accessor
 	#
 	my $fieldAccessor;
-	if (@{$self->{_fieldrefs}})
+	if (@{$self->{_fieldrefs}} || (@_ && !defined($_[0]) && $refCount))
 	{
-		# the query uses fields, so there must be a field accessor first 
+		# the query uses fields, or there's an undef and at least one ref, there must be a field accessor first 
 		#
 		$fieldAccessor = shift(@_);
 		
@@ -96,10 +100,9 @@ sub __qgrep
 		}
 		else
 		{
-			# for laziness, the caller passed undef and so we can assume the objects to be queried
-			# are in fact plain hashes so we manufacture a field accessor for that
+			# for laziness, the caller passed undef; if there's any fields mentioned in the query, make a field accessor 
 			#
-			$fieldAccessor = Grep::Query::FieldAccessor->newDefault(@{$self->{_fieldrefs}});
+			$fieldAccessor = Grep::Query::FieldAccessor->newDefault(@{$self->{_fieldrefs}}) if @{$self->{_fieldrefs}};
 		}
 	}
 	else
@@ -109,20 +112,16 @@ sub __qgrep
 		croak("no fields used in query, yet the first list argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
 	}
 
-	# trim away undef values
-	#
-	my @list = map { defined($_) ? $_ : () } @_;
-	
 	# nothing to see here
 	#
-	return(wantarray() ? () : 0) unless @list;
+	return(wantarray() ? () : 0) unless @_;
 	
 	# try to make sure all items in the list have the same structure...
 	#
-	if (@list > 1)
+	if (@_ > 1)
 	{
-		my $fp = __fingerprint(Digest::MD5->new(), $list[0])->hexdigest();
-		foreach my $entry (@list)
+		my $fp = __fingerprint(Digest::MD5->new(), $_[0])->hexdigest();
+		foreach my $entry (@_)
 		{
 			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
 		}
@@ -135,15 +134,15 @@ sub __qgrep
 	# for this, we must have a fieldaccessor 
 	#
 	my $lonehash = 0;
-	if (scalar(@list) == 1 && ref($list[0]) eq 'HASH')
+	if (scalar(@_) == 1 && ref($_[0]) eq 'HASH')
 	{
 		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
 		my @eachList;
-		while (my @kv = each %{$list[0]})
+		while (my @kv = each %{$_[0]})
 		{
 			push(@eachList, \@kv);
 		}
-		@list = @eachList;
+		@_ = @eachList;
 		$lonehash = 1;
 	} 
 	
@@ -156,7 +155,7 @@ sub __qgrep
 	# keys are simply a number, and values are refs to the individual scalars/objects to avoid copying them
 	#
 	my $id = 0;
-	my %data = map { $id++ => \$_ } @list;
+	my %data = map { $id++ => \$_ } @_;
 	
 	# kick off the query 
 	#

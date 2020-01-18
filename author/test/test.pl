@@ -6,6 +6,54 @@ use lib "$Bin/../../lib";
 use Data::Dump qw(pp);
 use Grep::Query qw(qgrep);
 
+my @hl =
+(
+	undef,
+	1,
+	undef,
+);
+
+my @hl3 = qgrep('defined', @hl);
+print pp(\@hl3), "\n";
+
+my @deeplist =
+	(
+		{ fee => 1, fie => [ 1,2,3,4 ], foo => { a => 10 }, text => [ 'abc', 'xyz' ] },
+		{ fee => 2, fie => [ 4,5,6,undef ], foo => { a => 20 }, text => [ 'plugh!', 'xyzzy' ]  },
+		{ fee => 3, fie => [ 7,8,9,10 ], foo => { a => 30 }, text => [ 'Tilo', 'Santino' ]  },
+	);
+
+my @hits2 = qgrep('fie->[3].defined', undef, @deeplist);
+print pp(\@hits2), "\n";
+
+__END__
+my @hl =
+(
+	{ fee => 1, fie => 2, foo => 3 },
+	{ fee => 4, fie => 5, foo => 6 },
+	{ fee => 7, fie => 8, foo => 9 },
+);
+
+my @hl3 = qgrep('true', undef, @hl);
+print pp(\@hl3), "\n";
+__END__
+
+my $x = scalar(grep { ref($_) } (1,2,3,{},{}));
+print "x=$x\n";
+
+__END__
+my @hl =
+(
+	{ fee => 1, fie => 2, foo => 3 },
+	{ fee => 4, fie => 5, foo => 6 },
+	{ fee => 7, fie => 8, foo => 9 },
+);
+
+my @hl3 = qgrep('true', undef, @hl);
+print pp(\@hl3), "\n";
+
+
+__END__
 use Digest::Adler32;
 
 my $digest = Digest::Adler32->new();

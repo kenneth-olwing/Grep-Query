@@ -126,6 +126,10 @@ sub __preprocessParsedQuery
 					{
 						$parsedQuery->{$k}->{op} = eval "sub { 0 }";						
 					}
+					elsif ($op eq 'defined')
+					{
+						$parsedQuery->{$k}->{op} = eval "sub { defined(\$_[0]) ? 1 : 0 }";						
+					}
 					elsif ($op =~ /^(?:regexp|=~)$/)
 					{
 						$parsedQuery->{$k}->{value} = __compileRx($parsedQuery->{$k}->{value});
@@ -209,7 +213,7 @@ unary:
 
 field_op_value_test:
 		/
-				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false)
+				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)								# allow paired '()' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
