@@ -486,7 +486,17 @@ The I<operator>s are:
 
 =item * B<TRUE> or B<FALSE>
 
-These operators always evaluate to true and false respectively.
+These operators always evaluate to true and false respectively. They take no argument.
+
+=item * B<DEFINED>
+
+This matches if the value is defined (i.e. not 'undef'). It takes no argument.
+
+=item * B<SIZE>
+
+This matches if the value has the given 'size' argument, where the size depends on the
+data type - a scalar is simply the (text) length, an array is the array size, and a hash
+is the number of pairs.  
 
 =item * B<REGEXP> or B<=~>
 

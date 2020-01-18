@@ -20,10 +20,10 @@ my @deeplist =
 	(
 		{ fee => 1, fie => [ 1,2,3,4 ], foo => { a => 10 }, text => [ 'abc', 'xyz' ] },
 		{ fee => 2, fie => [ 4,5,6,undef ], foo => { a => 20 }, text => [ 'plugh!', 'xyzzy' ]  },
-		{ fee => 3, fie => [ 7,8,9,10 ], foo => { a => 30 }, text => [ 'Tilo', 'Santino' ]  },
+		{ fee => 3333, fie => [ 7,8,9,10 ], foo => { a => 30 }, text => [ 'Tilo', 'Santino' ]  },
 	);
 
-my @hits2 = qgrep('fie->[3].defined', undef, @deeplist);
+my @hits2 = qgrep('fee.size(4)', undef, @deeplist);
 print pp(\@hits2), "\n";
 
 __END__
