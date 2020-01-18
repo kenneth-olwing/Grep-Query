@@ -498,6 +498,11 @@ This matches if the value has the given 'size' argument, where the size depends 
 data type - a scalar is simply the (text) length, an array is the array size, and a hash
 is the number of pairs.  
 
+=item * B<TYPE>
+
+This matches if the value has the given 'type' argument, where the type can be 'scalar',
+'array' or 'hash'. 
+
 =item * B<REGEXP> or B<=~>
 
 This operator expects to use the I<value> as a regular expression for use in

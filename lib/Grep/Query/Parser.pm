@@ -130,6 +130,12 @@ sub __preprocessParsedQuery
 					{
 						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? 1 : 0 };						
 					}
+					elsif ($op eq 'type')
+					{
+						my $v = $parsedQuery->{$k}->{value};
+						croak("Bad value for '$op' => '$v', must be one of: 'scalar', 'array' or 'hash'") unless $v =~ /^(?:scalar|array|hash)$/i;
+						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? (lc($v) eq (lc(ref($_[0])) || 'scalar') ) : 0 };						
+					}
 					elsif ($op eq 'size')
 					{
 						my $possibleNumber = $parsedQuery->{$k}->{value};
@@ -144,7 +150,7 @@ sub __preprocessParsedQuery
 												: ($reftype eq 'HASH')
 													? scalar(keys(%{$_[0]}))
 													: length($_[0]);
-									defined($sz) ? $comparator->($possibleNumber, $sz) : 0;
+									defined($sz) ? $possibleNumber == $sz : 0;
 								};						
 					}
 					elsif ($op =~ /^(?:regexp|=~)$/)
@@ -231,11 +237,11 @@ unary:
 field_op_value_test:
 		/
 				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)								# allow paired '()' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]							# allow paired '[]' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)							# allow paired '()' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}							# allow paired '{}' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]							# allow paired '[]' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
 		/ix { bless( { field => $+{field}, op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
 
 or:

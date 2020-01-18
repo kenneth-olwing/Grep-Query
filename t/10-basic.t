@@ -9,7 +9,7 @@ push(@miscDelims, chr($_)) for (33..39, 42..59, 61, 63..90, 92, 94..122, 124, 12
 
 use Test::More;
 
-plan(tests => 24 + scalar(@miscDelims));
+plan(tests => 25 + scalar(@miscDelims));
 
 is(scalar(qgrep('true')), 0, "query empty plain set (non-OO)");
 is(scalar(qgrep('TRUE')), 0, "query empty plain set (non-OO)");
@@ -19,6 +19,14 @@ is(scalar(qgrep('FALSE')), 0, "query empty plain set (non-OO)");
 is(scalar(qgrep('defined', 1, undef, 2, undef)), 2, "query set with two defined values (non-OO)");
 
 is(scalar(qgrep('size(3)', 'aaa', undef, 'b', 'cccc', 'ddd')), 2, "query set with two values of size 3 (non-OO)");
+
+my @typetestlist =
+(
+	{ fee => [1, undef, 3] },
+	{ fee => [4, 5, 6] },
+	{ fee => [7, 8, 9] },
+);
+is(scalar(qgrep('fee.type(ARRAY) && fee->[1].type(scalar)', undef, @typetestlist)), 2, "query set with two values of size 3 (non-OO)");
 
 is(scalar(qgrep('REGEXP(.*)')), 0, "query empty plain set (non-OO)");
 

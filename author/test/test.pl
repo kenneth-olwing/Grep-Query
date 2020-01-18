@@ -8,14 +8,15 @@ use Grep::Query qw(qgrep);
 
 my @hl =
 (
-	undef,
-	1,
-	undef,
+	{ fee => [undef, undef, undef] },
+	{ fee => [1,2,3] },
+	{ fee => [undef, undef, undef] },
 );
 
-my @hl3 = qgrep('defined', @hl);
+my @hl3 = qgrep('fee.type(ARRAY) && fee->[2].type(scalar)', undef, @hl);
 print pp(\@hl3), "\n";
 
+__END__
 my @deeplist =
 	(
 		{ fee => 1, fie => [ 1,2,3,4 ], foo => { a => 10 }, text => [ 'abc', 'xyz' ] },
