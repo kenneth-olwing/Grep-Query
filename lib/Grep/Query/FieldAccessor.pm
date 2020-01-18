@@ -97,7 +97,7 @@ sub __fetchvalue
 	
 	# do we have a hash key or an array index?
 	#
-	if ($point =~ /^\[(\d+)\]$/)
+	if ($point =~ /^\[(-?\d+)\]$/)
 	{
 		($arridx, $exptype) = ($1, 'ARRAY');
 	}

@@ -130,6 +130,11 @@ sub __preprocessParsedQuery
 					{
 						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? 1 : 0 };						
 					}
+					elsif ($op eq 'exists')
+					{
+						my $key = $parsedQuery->{$k}->{value};
+						$parsedQuery->{$k}->{op} = sub { ( defined($_[0]) && ref($_[0]) eq 'HASH' ) ? exists($_[0]->{$key}) : 0 };						
+					}
 					elsif ($op eq 'type')
 					{
 						my $v = $parsedQuery->{$k}->{value};
@@ -237,11 +242,11 @@ unary:
 field_op_value_test:
 		/
 				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)							# allow paired '()' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}							# allow paired '{}' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]							# allow paired '[]' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)							# allow paired '()' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}							# allow paired '{}' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]							# allow paired '[]' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|size|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
 		/ix { bless( { field => $+{field}, op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
 
 or:
