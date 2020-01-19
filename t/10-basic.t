@@ -18,7 +18,7 @@ is(scalar(qgrep('FALSE')), 0, "query empty plain set (non-OO)");
 
 is(scalar(qgrep('defined', 1, undef, 2, undef)), 2, "query set with two defined values (non-OO)");
 
-is(scalar(qgrep('size(3)', 'aaa', undef, 'b', 'cccc', 'ddd')), 2, "query set with two values of size 3 (non-OO)");
+is(scalar(qgrep('size==(3)', 'aaa', undef, 'b', 'cccc', 'ddd')), 2, "query set with two values of size 3 (non-OO)");
 
 my @typetestlist =
 (

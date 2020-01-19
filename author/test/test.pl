@@ -8,12 +8,13 @@ use Grep::Query qw(qgrep);
 
 my @hl =
 (
+#	'a', 'bb', 'ccc'
 	{ fee => 1, fie => [1,2,3], foo => { bar => 1}, brum => undef },
 	{ fee => 2, fie => [4,5,6], foo => { bar => 2}, brum => undef },
 	{ fee => 3, fie => [7,8,9], foo => { bar => 3}, brum => undef },
 );
 
-my @hl3 = qgrep('brum.exists(bar)', undef, @hl);
+my @hl3 = qgrep('fie.size>=(2)', undef, @hl);
 print pp(\@hl3), "\n";
 
 __END__
