@@ -118,14 +118,14 @@ sub __qgrep
 	
 	# try to make sure all items in the list have the same structure...
 	#
-	if (@_ > 1)
-	{
-		my $fp = __fingerprint(Digest::MD5->new(), $_[0])->hexdigest();
-		foreach my $entry (@_)
-		{
-			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
-		}
-	}
+#	if (@_ > 1)
+#	{
+#		my $fp = __fingerprint(Digest::MD5->new(), $_[0])->hexdigest();
+#		foreach my $entry (@_)
+#		{
+#			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
+#		}
+#	}
 	
 	# a special case:
 	# if there is only one argument AND it is a hash ref, we can let loose a query on it
@@ -134,17 +134,17 @@ sub __qgrep
 	# for this, we must have a fieldaccessor 
 	#
 	my $lonehash = 0;
-	if (scalar(@_) == 1 && ref($_[0]) eq 'HASH')
-	{
-		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
-		my @eachList;
-		while (my @kv = each %{$_[0]})
-		{
-			push(@eachList, \@kv);
-		}
-		@_ = @eachList;
-		$lonehash = 1;
-	} 
+#	if (scalar(@_) == 1 && ref($_[0]) eq 'HASH')
+#	{
+#		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
+#		my @eachList;
+#		while (my @kv = each %{$_[0]})
+#		{
+#			push(@eachList, \@kv);
+#		}
+#		@_ = @eachList;
+#		$lonehash = 1;
+#	} 
 	
 	# the list we were given needs to be made into a hash with unique keys so we
 	# identify 'rows' while evaluating the query

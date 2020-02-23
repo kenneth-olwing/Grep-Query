@@ -1,10 +1,33 @@
 use strict;
 use warnings;
+use feature qw(:5.30);
 
 use FindBin qw($Bin);
-use lib "$Bin/../../lib";
+use lib ("c:/ken1/slask/Data-Dpath-0.58/lib", "$Bin/../../lib");
 use Data::Dump qw(pp);
 use Grep::Query qw(qgrep);
+use JSON;
+use Path::Tiny;
+
+my $data = path('c:/ken1/tmp/wlstab.json')->slurp_raw();
+my @doms = @{ decode_json($data) };
+
+say scalar(@doms);
+#say pp($json);
+
+#my @doms = 
+#	(
+#		{ dom => 1 },
+#		{ dom => 2 },
+#		{ foo => 3 },
+#	);
+#my @result = qgrep(q{path(//.[key eq 'realhost' && value =~ /u12663/])}, undef, @doms);
+#my @result = qgrep(q{path(/serverobjs/*/*[key eq 'realhost' && value =~ /u12663/])}, undef, @doms);
+my @result = qgrep(q{dom.regexp(^KL)}, undef, @doms);
+
+say scalar(@result);
+say $_->{dom} foreach (@result);
+__END__
 
 my @hl =
 (
