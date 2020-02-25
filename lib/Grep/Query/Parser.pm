@@ -249,11 +249,11 @@ unary:
 field_op_value_test:
 		/
 				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
-			|	(?<op>(?i)path)\((?<value>[^)]*)\)								# allow paired '()' delimiters
-			|	(?<op>(?i)path)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
-			|	(?<op>(?i)path)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
-			|	(?<op>(?i)path)<(?<value>[^>]*)>								# allow paired '<>' delimiters
-			|	(?<op>(?i)path)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
+			|	(?<op>(?i)path)\((?<value>[^)]*)\)																									# allow paired '()' delimiters
+			|	(?<op>(?i)path)\{(?<value>[^}]*)\}																									# allow paired '{}' delimiters
+			|	(?<op>(?i)path)\[(?<value>[^\]]*)\]																									# allow paired '[]' delimiters
+			|	(?<op>(?i)path)<(?<value>[^>]*)>																									# allow paired '<>' delimiters
+			|	(?<op>(?i)path)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}																		# allow arbitrary delimiter
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\((?<value>[^)]*)\)															# allow paired '()' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\{(?<value>[^)]*)\}															# allow paired '{}' delimiters
 			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\[(?<value>[^)]*)\]															# allow paired '[]' delimiters
