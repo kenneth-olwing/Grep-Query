@@ -232,11 +232,6 @@ my $data =
 				# FIXUP
 			},
 			
-		lonehash =>
-			{
-				# FIXUP
-			},
-			
 		nested =>
 			{
 				a =>
@@ -306,7 +301,6 @@ my $data =
 	};
 
 $data->{objects}->{$_} = TestObject->new($_, $data->{records}->{$_}) foreach (keys(%{$data->{records}}));
-$data->{lonehash} = { lonehash => $data->{records} };
 
 my $tests =
 	{
@@ -748,63 +742,6 @@ QRY
 				},
 			],
 			
-		lonehash =>
-			[
-				{
-					q => 'key.REGEXP(.*)',
-					e => undef,		# FIXUP
-				},
-				{
-					q => 'key.REGEXP([dkob])',
-					e => [ qw(b d k o) ],
-				},
-
-				{
-					q => 'name.REGEXP/(?i)a/',
-					e => [ qw(a d f g h i j l m o p q r s u v w x y) ],
-				},
-				{
-					q => 'name.REGEXP/(?i)a/ AND siblings.>(1)',
-					e => [ qw(a f g j m o p q s u v w x) ],
-				},
-				{
-					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960)',
-					e => [ qw(a f g m p q s w) ],
-				},
-				{
-					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M)',
-					e => [ qw(f m w) ],
-				},
-				{
-					q => 'name.REGEXP/(?i)a/ AND siblings.>(1) AND byear.<(1960) AND sex.REGEXP(M) AND city.REGEXP(z)',
-					e => [ qw(f m) ],
-				},
-				{
-					q => <<'QRY',
-						name.REGEXP/(?i)a/
-							AND
-						siblings.>(1)
-							AND
-						byear.<(1960)
-							AND
-						(
-							(
-								sex.REGEXP(M)
-									AND
-								city.REGEXP(z)
-							)
-								OR
-							(
-								sex.REGEXP(F)
-									AND
-								city.REGEXP(l)
-							)
-						)
-QRY
-					e => [ qw(a f m p s) ],
-				},
-			],
-			
 		nested =>
 			[
 				{
@@ -838,10 +775,6 @@ my @objectValues;
 push(@objectValues, $data->{objects}->{$_}) foreach (sort(keys(%{$data->{objects}})));
 $tests->{objects}->[0]->{e} = [ map { $_->get_id() } @objectValues ];
 
-my @lonehashValues;
-push(@lonehashValues, $_) foreach (sort(keys(%{$data->{lonehash}->{lonehash}})));
-$tests->{lonehash}->[0]->{e} = \@lonehashValues;
-
 my $fieldAccessors =
 	{
 		records =>
@@ -874,21 +807,6 @@ my $fieldAccessors =
 					),
 			],	
 
-		lonehash =>
-			[
-				Grep::Query::FieldAccessor->new
-					(
-						{
-							key => sub { $_[0]->[0] },
-							name => sub { $_[0]->[1]->{name} },
-							byear => sub { $_[0]->[1]->{byear} },
-							siblings => sub { $_[0]->[1]->{siblings} },
-							city => sub { $_[0]->[1]->{city} },
-							sex => sub { $_[0]->[1]->{sex} },
-						}
-					),
-			],
-			
 		nested =>
 			[
 				undef
@@ -915,7 +833,6 @@ my $matchAdjustors =
 	{
 		records => sub { $_[0] },
 		objects => sub { [ map { $_->get_id() } @{$_[0]} ] },
-		lonehash => sub { [ sort(keys(%{$_[0]->[0]})) ] },
 		nested => sub { $_[0] },
 	};
 
