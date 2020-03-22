@@ -137,7 +137,7 @@ sub xeq
 		{
 			my $rv = $data->{$_};
 			my $v = defined($fieldAccessor) ? $fieldAccessor->access($self->{field}, $$rv) : $$rv;
-			$answer{$_} = $rv if $self->{op}->($v, $self->{value});
+			$answer{$_} = $rv if $self->{op}->($v, $self->{value}, $$rv);
 			0;
 		} keys(%$data);
 	

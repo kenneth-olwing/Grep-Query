@@ -113,7 +113,7 @@ if (lc($a) eq 'yes')
 	system("git commit -a -F $msgfile2 2>&1");
 	die("Failed commit") if $?;
 
-	system("git tag $nextTag 2>&1");
+	system("git tag -a -m rel $nextTag 2>&1");
 	die("Failed tag\n") if $?;
 	
 	system("git push origin $br[0] $nextTag 2>&1");

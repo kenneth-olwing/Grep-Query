@@ -7,4 +7,4 @@ use lib "$Bin/lib";
 
 use TestUtils;
 
-TestUtils::runAsFieldedTests('lonehash');
+TestUtils::runAsFieldedTests('nested-dpath');

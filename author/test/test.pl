@@ -1,10 +1,227 @@
 use strict;
 use warnings;
+use feature qw(:5.30);
 
 use FindBin qw($Bin);
-use lib "$Bin/../../lib";
+use lib ("c:/ken1/slask/Data-Dpath-0.58/lib", "$Bin/../../lib", "c:/ken1/ws/wlstools/perl/src/lib.NG/perl");
+#use lib ("$Bin/../../lib");
 use Data::Dump qw(pp);
 use Grep::Query qw(qgrep);
+use JSON;
+use Path::Tiny;
+use Data::DPath 'dpath';
+
+my @nested =
+			(
+				{
+					fee => 1,
+					fie =>
+						[
+							1,
+							2,
+							3
+						],
+					foo =>
+						{
+							a => 10,
+							b => 12,
+							c => 14,
+						},
+					text =>
+						[
+							'abc',
+							'xyz',
+						],
+				},
+
+				{
+					fee => 2,
+					fie =>
+						[
+							4,
+							5,
+							6
+						],
+					foo =>
+						{
+							a => 20,
+							b => 22,
+							c => 24,
+						},
+					text =>
+						[
+							'plugh!',
+							'xyzzy',
+						],
+				},
+
+				{
+					fee => 3,
+					fie =>
+						[
+							7,
+							8,
+							9
+						],
+					foo =>
+						{
+							a => 30,
+							b => 32,
+							c => 34,
+						},
+					text =>
+						[
+							'Tilo',
+							'Santino',
+						],
+				},
+			);
+	
+say "hw";
+#say pp($nested);
+
+my @result = qgrep(q{path(/fee[value == 3])}, undef, @nested);
+say pp(\@result);
+
+__END__
+my @data  = (
+				{
+					AAA  =>
+						{
+							BBB =>
+								{
+									CCC  =>
+										[
+											qw/ XXX YYY ZZZ /
+										]
+								},
+					RRR =>
+						{
+							CCC =>
+								[
+									qw/ RR1 RR2 RR3 /
+								]
+						},
+					DDD =>
+						{
+							EEE =>
+								[
+									qw/ uuu vvv www /
+								]
+						},
+                     },
+				}
+            );
+
+my @result = qgrep(q{path(/AAA/BBB/CC)}, undef, @data);
+say pp(\@result);
+
+__END__
+my $data  = {
+             AAA  => { BBB => { CCC  => [ qw/ XXX YYY ZZZ / ] },
+                       RRR => { CCC  => [ qw/ RR1 RR2 RR3 / ] },
+                       DDD => { EEE  => [ qw/ uuu vvv www / ] },
+                     },
+            };
+ 
+# Perl 5.8 style
+#my @resultlist = dpath('/AAA/*/CCC')->match($data); # ( ['XXX', 'YYY', 'ZZZ'], [ 'RR1', 'RR2', 'RR3' ] )
+my @resultlist = dpath('//EEE')->match($data); # ( ['XXX', 'YYY', 'ZZZ'], [ 'RR1', 'RR2', 'RR3' ] )
+say pp(\@resultlist);
+ 
+__END__
+my @nested =
+			(
+				{
+					fee => 1,
+					fie =>
+						[
+							1,
+							2,
+							3
+						],
+					foo =>
+						{
+							a => 10,
+							b => 12,
+							c => 14,
+						},
+					text =>
+						[
+							'abc',
+							'xyz',
+						],
+				},
+
+				{
+					fee => 2,
+					fie =>
+						[
+							4,
+							5,
+							6
+						],
+					foo =>
+						{
+							a => 20,
+							b => 22,
+							c => 24,
+						},
+					text =>
+						[
+							'plugh!',
+							'xyzzy',
+						],
+				},
+
+				{
+					fee => 3,
+					fie =>
+						[
+							7,
+							8,
+							9
+						],
+					foo =>
+						{
+							a => 30,
+							b => 32,
+							c => 34,
+						},
+					text =>
+						[
+							'Tilo',
+							'Santino',
+						],
+				},
+			);
+	
+say "hw";
+#say pp($nested);
+
+my @result = qgrep(q{path(/)}, undef, @nested);
+say pp(\@result);
+
+__END__
+my $data = path('c:/ken1/tmp/wlstab.json')->slurp_raw();
+my @doms = @{ decode_json($data) };
+
+say scalar(@doms);
+#say pp($json);
+
+#my @doms = 
+#	(
+#		{ dom => 1 },
+#		{ dom => 2 },
+#		{ foo => 3 },
+#	);
+#my @result = qgrep(q{path(//.[key eq 'realhost' && value =~ /u12663/])}, undef, @doms);
+#my @result = qgrep(q{path(/serverobjs/*/*[key eq 'realhost' && value =~ /u12663/])}, undef, @doms);
+my @result = qgrep(q{dom.regexp(^KL)}, undef, @doms);
+
+say scalar(@result);
+say $_->{dom} foreach (@result);
+__END__
 
 my @hl =
 (
